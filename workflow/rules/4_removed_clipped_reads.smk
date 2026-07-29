@@ -18,6 +18,6 @@ rule removed_clipped_reads:
     threads: 1
     resources:
         mem_mb=2000,
-        runtime=30
+        runtime=90
     wrapper:
         "file:workflow/wrapper_functions/sam_to_bam"

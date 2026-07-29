@@ -2,21 +2,21 @@
 
 # Directory prefix where the outputs will be saved to
 # Rename this to your preferred naming convention with this format:year-month-day_Project_Name_SNPmake
-prefix: 2026-07-24_CladeIV_telomeremask
+prefix: 2026-07-15_cladeI
 
 # Relative path where your samples are found
-samples: config/samples.csv
+samples: config/samples_Clade_I.csv
 
 # raw or trimmed
 read_input_type: trimmed   # options: raw or trimmed
-input_reads: temp_reads_dir2/Clade_IV/
+input_reads: /scratch/esnitkin_root/esnitkin0/jjhale/snpkit_testing/SNPmake/temp_reads_dir/Clade_I/
 
 # run mode
 workflow_mode: full    # options: full, vcf-only
 
 # Path to the reference genome
-reference_genome: /scratch/esnitkin_root/esnitkin0/jjhale/snpkit_testing/reference/telomere_mask_v1/Chi_Caur_3/Chi_Caur_3.fasta
-reference_contig: Chi_Caur_3
+reference_genome: /scratch/esnitkin_root/esnitkin0/jjhale/snpkit_testing/reference/b8441/b8441.fasta
+reference_contig: b8441
 
 # Set the estimated genome size for coverage calculations 
 genome_size: 12400000

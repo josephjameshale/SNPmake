@@ -28,7 +28,7 @@ rule make_indel_prox_mask_vcf:
     threads: 1
     resources:
             mem_mb=1000,
-            runtime=10
+            runtime=60
     shell:
         r"""
         set -euo pipefail
@@ -36,7 +36,7 @@ rule make_indel_prox_mask_vcf:
 
         VCF_SAMPLE=$(bcftools query -l {input.pass_vcf} | head -n 1)
 
-        python workflow/scripts/make_indel_prox_mask_vcf.py \
+        python3.11 workflow/scripts/make_indel_prox_mask_vcf.py \
           --ref {input.ref} \
           --raw {input.raw} \
           --indel_removed {input.indel_removed} \

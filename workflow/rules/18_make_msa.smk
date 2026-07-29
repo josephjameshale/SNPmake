@@ -12,7 +12,7 @@ rule make_msa:
     threads: 2
     resources:
         mem_mb=1000,
-        runtime=15
+        runtime=180
     shell:
         r"""
         set -euo pipefail

@@ -30,7 +30,7 @@ rule make_filtered_mask_vcf:
 
         VCF_SAMPLE=$(bcftools query -l {input.pass_vcf} | head -n 1)
 
-        python workflow/scripts/make_filtered_mask_vcf.py \
+        python3.11 workflow/scripts/make_filtered_mask_vcf.py \
           --ref {input.ref} \
           --raw {input.raw} \
           --final {input.final} \
@@ -62,7 +62,7 @@ rule summarize_filtered_out_variants:
     shell:
         """
         set -euo pipefail
-        python workflow/scripts/summarize_filtered_out_variants.py \
+        python3.11 workflow/scripts/summarize_filtered_out_variants.py \
           --raw {input.raw} \
           --final {input.final} \
           --depth {input.depth} \
@@ -87,7 +87,7 @@ rule summarize_pass_alt_variants:
     shell:
         r"""
         set -euo pipefail
-        python workflow/scripts/summarize_pass_variants_with_depth.py \
+        python3.11 workflow/scripts/summarize_pass_variants_with_depth.py \
           --vcf {input.vcf} \
           --depth {input.depth} \
           --sample {wildcards.sample} \

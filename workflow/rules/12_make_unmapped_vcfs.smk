@@ -60,7 +60,7 @@ rule summarize_unmapped_positions:
     shell:
         r"""
         set -euo pipefail # three error handlong behaviors: exit on error, treat unset variables as error, and fail if any command in a pipeline fails
-        python workflow/scripts/summarize_unmapped_positions.py \
+        python3.11 workflow/scripts/summarize_unmapped_positions.py \
           --ref {input.ref} \
           --unmapped {input.unmapped} \
           --sample {params.sample} \

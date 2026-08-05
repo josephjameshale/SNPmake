@@ -8,11 +8,11 @@
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=10g
-#SBATCH --time=06:00:00
+#SBATCH --time=01:00:00
 
 source ~/miniconda3/etc/profile.d/conda.sh
 conda activate snpsites
 
-python scripts/make_dist_matrix.py -i 
+python3.12 scripts/make_dist_matrix.py -i results/2026-08-04_tps1evo_mini/
 
 

@@ -14,7 +14,7 @@ def make_dist_matrix(input_dir):
         print(f'Error: could not find the MSA file in {alignment_dir}')
         quit(1)
     # run snp-sites to reduce the msa to only variant sites
-    fname = os.path.basename(msa_fname).split('.')[0]
+    fname = os.path.basename(msa_fname).split('_genome_aln')[0]
     msa_var_fname = os.path.join(alignment_dir, f'{fname}_variant_only_alignment.fa')
     cmd1 = ['snp-sites', '-o', msa_var_fname, msa_fname]
     subprocess.run(cmd1)

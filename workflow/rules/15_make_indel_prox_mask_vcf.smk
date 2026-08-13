@@ -39,7 +39,7 @@ rule make_indel_prox_mask_vcf:
         python3.11 workflow/scripts/make_indel_prox_mask_vcf.py \
           --ref {input.ref} \
           --raw {input.raw} \
-          --indel_removed {input.indel_removed} \
+          --indel_removed {input.pass_vcf} \
           --chrom {params.chrom} \
           --unmapped_positions {input.unmapped} \
           {params.phage_arg} \
@@ -49,6 +49,12 @@ rule make_indel_prox_mask_vcf:
         bgzip -f {params.outdir}/{wildcards.sample}_indel_prox_mask.vcf
         tabix -f -p vcf {output.vcf_gz}
         """
+
+# --indel_removed was originally this line:
+# --indel_removed {input.indel_removed} \
+# it was changed to:
+# --indel_removed {input.pass_vcf} \
+
 
 rule summarize_indel_prox_positions:
     input:

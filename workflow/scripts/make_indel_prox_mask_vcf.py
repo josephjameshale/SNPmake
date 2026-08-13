@@ -89,8 +89,17 @@ def main():
     raw_snps = snp_positions_from_vcf(args.raw, chrom=args.chrom)
     kept_snps = snp_positions_from_vcf(args.indel_removed, chrom=args.chrom)
 
+    # ensure that kept_snps is a subset of raw_snps
+    if not kept_snps.issubset(raw_snps):
+        print(f'Error: the set of snps in {args.indel_removed} is not a subset of the set of snps in {args.raw}.')
+        quit(1)
+
     # INDEL_PROX = SNPs removed by 5bp indel filter
     indel_prox = set(raw_snps - kept_snps)
+
+    # check if any snps were retained
+    if raw_snps == indel_prox:
+        print(f'Warning: No SNPs were retained after filtering {args.indel_removed}!')
 
     # Exclude UNMAPPED positions (dash wins; keep categories exclusive)
     if args.unmapped_positions:

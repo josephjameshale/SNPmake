@@ -19,7 +19,6 @@ default-resources:
   - slurm_partition=standard
   - runtime=90
   - mem_mb=5000
-  - slurm_extra="--output=slurm_out/slurm-%j.out"
 
 local-cores: 1
 rerun-incomplete: true

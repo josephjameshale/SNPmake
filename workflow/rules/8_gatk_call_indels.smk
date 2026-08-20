@@ -1,10 +1,13 @@
 # variant calling 
 # gatk
 # calling snp/indel and subset of variants using gatk
+# NOTE: as written, this vcf file may contain multiallelic sites!
+
 rule gatk_call_indels:
     input:
         index_sorted_dups_rmvd_bam = "results/{prefix}/post_align/{sample}/sorted_bam_dups_removed/{sample}_final.bam",
     output:
+        multiallelic_vcf = temp("results/{prefix}/gatk_varcall/{sample}/{sample}_aln_mpileup_raw_multiallelic.vcf"),
         final_raw_vcf= "results/{prefix}/gatk_varcall/{sample}/{sample}_aln_mpileup_raw.vcf",
         indel_file = temp("results/{prefix}/gatk_varcall/{sample}/{sample}_indel.vcf"),
         zipped_indel_vcf = "results/{prefix}/gatk_varcall/{sample}/{sample}_indel.vcf.gz"

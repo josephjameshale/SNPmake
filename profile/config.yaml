@@ -1,13 +1,13 @@
 # profile/config.yaml
 
 # General snakemake parameters
-use-conda: true
+use-conda: false
 use-singularity: true
 use-envmodules: true
 printshellcmds: true
 latency-wait: 100
 nolock: true
-conda-frontend: mamba
+conda-frontend: conda
 jobs: 50
 
 # Slurm parameters

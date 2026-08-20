@@ -1,3 +1,4 @@
+# plan to skip this
 rule make_filtered_mask_vcf:
     input:
         raw="results/{prefix}/samtools_varcall/{sample}/{sample}_aln_mpileup_raw.vcf",
@@ -6,7 +7,7 @@ rule make_filtered_mask_vcf:
         ref=REF_GENOME
     output:
         vcf_gz="results/{prefix}/filtered_mask_vcf/{sample}/{sample}_filtered_mask.vcf.gz",
-        tbi="results/{prefix}/filtered_mask_vcf/{sample}/{sample}_filtered_mask.vcf.gz.tbi"
+        tbi="results/{prefix}/filtered_mask_vcf/{sample}/{sample}_filtered_mask.vcf.gz.tbi",
     params:
         outdir="results/{prefix}/filtered_mask_vcf/{sample}"
     # singularity:

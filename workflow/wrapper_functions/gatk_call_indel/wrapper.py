@@ -10,7 +10,7 @@ ref_genome = snakemake.params.get("ref_genome", "")
 
 # GATK
 shell("""
-        gatk HaplotypeCaller -R {ref_genome} -I {snakemake.input.index_sorted_dups_rmvd_bam} -O {snakemake.output.final_raw_vcf} --native-pair-hmm-threads 8 &&
+        gatk HaplotypeCaller -R {ref_genome} -I {snakemake.input.index_sorted_dups_rmvd_bam} -O {snakemake.output.final_raw_vcf} --native-pair-hmm-threads 8 --sample-ploidy 1 &&
         gatk SelectVariants -R {ref_genome} -V {snakemake.output.final_raw_vcf} -select-type INDEL -O {snakemake.output.indel_file} &> {snakemake.log}
         """)
 

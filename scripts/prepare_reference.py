@@ -1,4 +1,5 @@
 import os
+import shutil
 import argparse
 from Bio import SeqIO
 import mask_telomeres
@@ -31,7 +32,7 @@ def find_files(input_dir):
             quit(1)
     return fasta_fname, gff_fname
 
-def process_reference(input_dir, fasta_fname, gff_fname, singularity_repeatmasker, repeatmasker_lib):
+def process_reference(input_dir, fasta_fname, gff_fname, singularity_repeatmasker, repeatmasker_lib, mask_telomeres=False, concatenate_contigs=False):
     # move the original fasta and gff files to a new directory called "original_reference"
     original_reference_dir = os.path.join(input_dir, 'original_reference_files')
     fname = os.path.basename(fasta_fname).split('.')[0]
@@ -43,15 +44,33 @@ def process_reference(input_dir, fasta_fname, gff_fname, singularity_repeatmaske
         os.rename(gff_fname, original_gff_fname)
     else:
         original_gff_fname = None
+
     # mask telomeres with default settings of 5000 bases masked and 2000 base buffer around features
     telomere_masked_fasta = os.path.join(original_reference_dir, f'{fname}_telomere_masked.fasta')
-    mask_telomeres.mask_telomeres(original_fasta_fname, original_gff_fname, telomere_masked_fasta)
-    # run repeatmasker on the telomere masked fasta file
+    if mask_telomeres:
+        mask_telomeres.mask_telomeres(original_fasta_fname, original_gff_fname, telomere_masked_fasta)
+    else:
+        # if not masking telomeres, just copy
+        shutil.copy(original_fasta_fname, telomere_masked_fasta)
+
+    # perform hard-masking with repeatmasker
     cmd1 = ['singularity', 'exec', singularity_repeatmasker, 'RepeatMasker', '-dir', original_reference_dir, '-lib', repeatmasker_lib, '-pa', '1', telomere_masked_fasta]
     print(' '.join(cmd1))
     subprocess.run(cmd1)
+    # ensure the masked fasta file was successfully created
+    repeatmasker_fasta = telomere_masked_fasta + '.masked'
+    if not os.path.isfile(repeatmasker_fasta):
+        print(f'Error: Unable to locate the expected RepeatMasker output file: {repeatmasker_fasta}.')
+        quit(1)
+
     # concatenate the contigs in the masked fasta file together, using a default buffer size of 1000 N's
-    concatenate_reference_files.concatenate_reference_files(telomere_masked_fasta, original_gff_fname, fname, input_dir)
+    if concatenate_contigs:
+        concatenate_reference_files.concatenate_reference_files(repeatmasker_fasta, original_gff_fname, fname, input_dir)
+    else:
+        # if not concatenating, just copy the repeatmasker fasta to the input directory
+        shutil.copy(repeatmasker_fasta, fasta_fname)
+        if original_gff_fname is not None:
+            shutil.copy(original_gff_fname, gff_fname)
     # the concatenated and masked fasta should now be at fasta_fname
     # index the new fasta file with bwa and samtools
     cmd2 = ['bwa', 'index', fasta_fname]
@@ -82,14 +101,24 @@ def main():
         help='''Provide a path to the RepeatMasker library.''',
         default='/nfs/turbo/umms-esnitkin/Project_Cauris/Analysis/2025_funQCD_database/lib/repeat_libraries/fungi_b8441/b8441_fungi_repeatlib.fa'
         )
+    parser.add_argument(
+        '--mask_telomeres','-mt',action='store_true',
+        help='''Specify if you want to mask the telomeres in the reference genome.''',
+        default=False
+        )
+    parser.add_argument(
+        '--concatenate_contigs','-cc',action='store_true',
+        help='''Specify if you want to concatenate the contigs in the reference genome.''',
+        default=False
+        )
     args = parser.parse_args()
     fasta_fname, gff_fname = find_files(args.input)
     # check number of sequences in fasta file
     num_seqs = sum(1 for record in SeqIO.parse(fasta_fname, 'fasta'))
     if num_seqs == 1:
-        print(f'Reference genome appears to be already masked and concatenated (found 1 contig in {fasta_fname}).')
+        print(f'Reference genome appears to be already concatenated (found 1 contig in {fasta_fname}).')
     else:
-        process_reference(args.input, fasta_fname, gff_fname, args.singularity_repeatmasker, args.repeatmasker_lib)
+        process_reference(args.input, fasta_fname, gff_fname, args.singularity_repeatmasker, args.repeatmasker_lib, args.mask_telomeres, args.concatenate_contigs)
 
 if __name__ == "__main__":
     main()

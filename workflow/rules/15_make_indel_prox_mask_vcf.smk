@@ -1,3 +1,4 @@
+# since masked sites are retained in the final vcf file, this step should no longer be necessary
 rule make_indel_prox_mask_vcf:
     input:
         ref=REF_GENOME,

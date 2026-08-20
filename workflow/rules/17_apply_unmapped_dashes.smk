@@ -1,3 +1,4 @@
+# plan to skip this
 rule apply_unmapped_dashes:
     input:
         fasta="results/{prefix}/consensus_ref_allele_unmapped_variants/{sample}/{sample}_ref_allele_unmapped_variants.fa",

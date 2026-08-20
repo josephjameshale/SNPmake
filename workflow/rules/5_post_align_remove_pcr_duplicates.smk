@@ -1,10 +1,13 @@
 # remove duplicates and sort and index bam file with duplicates removed 
+# NOTE: consider marking duplicates instead of removing them
+# this can be done by changing the -REMOVE_DUPLICATES parameter in the wrapper function's picard command
 rule post_align_remove_pcr_duplicates:
     input:
         sorted_bam_out = "results/{prefix}/post_align/{sample}/sorted_bam/{sample}_aln_sort.bam"
     output:
         bam_duplicates_removed_out = temp("results/{prefix}/post_align/{sample}/remove_duplicates/{sample}_aln_marked.bam"),
-        dups_rmvd_sorted_bam_out = temp("results/{prefix}/post_align/{sample}/sorted_bam_dups_removed/{sample}_final.bam")
+        dups_rmvd_sorted_bam_out = temp("results/{prefix}/post_align/{sample}/sorted_bam_dups_removed/{sample}_final.bam"),
+        dups_rmvd_sorted_bam_out_bai = temp("results/{prefix}/post_align/{sample}/sorted_bam_dups_removed/{sample}_final.bam.bai"),
     params:
         outdir_dups_removed = "results/{prefix}/post_align/{sample}/remove_duplicates",
         outdir = "results/{prefix}/post_align/{sample}/sorted_bam_dups_removed/",

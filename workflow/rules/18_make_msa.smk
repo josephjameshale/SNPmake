@@ -1,22 +1,49 @@
-rule make_msa:
+
+# merge the final consensus vcf files for each sample
+rule merge_vcf:
     input:
         ref=REF_GENOME,
-        cons=expand(
-            "results/{prefix}/consensus_ref_allele_unmapped_variants/{sample}/{sample}_ref_allele_unmapped_variants.dash.fa",
+        vcfs=expand(
+            "results/{prefix}/consensus/{sample}/{sample}_pass_snp_only.vcf.gz",
             sample=SAMPLES, prefix=PREFIX
-        )
+        ),
+        vcf_tbis=expand(
+            "results/{prefix}/consensus/{sample}/{sample}_pass_snp_only.vcf.gz.tbi",
+            sample=SAMPLES, prefix=PREFIX
+        ),
     output:
-        msa="results/{prefix}/alignment/{prefix}_genome_aln_w_alt_allele_unmapped.fa"
-    # benchmark:
-    #     "benchmarks/{prefix}/make_msa/benchmark.tsv"
-    threads: 2
+        merged_vcf="results/{prefix}/merged_vcf/{prefix}_merged_pass_snp_only.vcf.gz",
+        merged_vcf_tbi="results/{prefix}/merged_vcf/{prefix}_merged_pass_snp_only.vcf.gz.tbi",
+    singularity:
+        "docker://staphb/bcftools:1.23.1"
+    threads: 1
     resources:
         mem_mb=1000,
         runtime=180
     shell:
-        r"""
-        set -euo pipefail
-
-        # concatenate reference first, then all samples
-        cat {input.ref} {input.cons} > {output.msa}
         """
+        bcftools merge -Oz -o {output.merged_vcf} {input.vcfs}
+        bcftools index -f -t {output.merged_vcf}
+        """
+
+
+
+
+# original method to make msa files - probably not applicable to a reference with multiple contigs
+# rule make_msa:
+#     input:
+#         ref=REF_GENOME,
+#         cons=expand(
+#             "results/{prefix}/consensus/{sample}/{sample}_consensus.fa",
+#             sample=SAMPLES, prefix=PREFIX
+#         )
+#     output:
+#         msa="results/{prefix}/alignment/{prefix}_consensus_msa.fa"
+#     threads: 1
+#     resources:
+#         mem_mb=1000,
+#         runtime=180
+#     shell:
+#         """
+#         cat {input.ref} {input.cons} > {output.msa}
+#         """

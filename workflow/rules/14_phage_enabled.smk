@@ -1,3 +1,4 @@
+# plan to skip this
 def phage_arg(wc):
     if PHAGE_ENABLED:
         return f"--phage_mask_vcf results/{wc.prefix}/phage_mask_vcf/{wc.sample}/{wc.sample}_phage_mask.vcf.gz"

@@ -87,47 +87,68 @@ MERGED_MSA = f"results/{PREFIX}/alignment/{PREFIX}_merged_with_existing.fa"
 
 FINAL_MSA = MERGED_MSA if USE_EXISTING_MSA else STANDARD_MSA
 
-VCF_ONLY_TARGETS = [
-    expand("results/{prefix}/samtools_varcall/{sample}/{sample}_aln_mpileup_raw.vcf.gz",
+# VCF_ONLY_TARGETS = [
+#     expand("results/{prefix}/samtools_varcall/{sample}/{sample}_aln_mpileup_raw.vcf.gz",
+#            prefix=PREFIX, sample=SAMPLES),
+
+#     expand("results/{prefix}/filtered_vcf/{sample}/{sample}_filter_snp_final.vcf.gz",
+#            prefix=PREFIX, sample=SAMPLES),
+
+#     expand("results/{prefix}/filtered_vcf/{sample}/{sample}_filter_indel_final.vcf.gz",
+#            prefix=PREFIX, sample=SAMPLES),
+
+#     expand("results/{prefix}/filtered_vcf/{sample}/{sample}_5bp_indel_removed.vcf.gz",
+#            prefix=PREFIX, sample=SAMPLES),
+# ]
+
+# FULL_TARGETS = VCF_ONLY_TARGETS + [
+#     expand("results/{prefix}/unmapped_vcf/{sample}/{sample}_unmapped.vcf.gz",
+#            prefix=PREFIX, sample=SAMPLES),
+
+#     expand("results/{prefix}/unmapped_positions/{sample}_unmapped_positions.tsv",
+#            prefix=PREFIX, sample=SAMPLES),
+
+#     expand("results/{prefix}/filtered_mask_vcf/{sample}/{sample}_filtered_mask.vcf.gz",
+#            prefix=PREFIX, sample=SAMPLES),
+
+#     expand("results/{prefix}/filtered_out_variants/{sample}_filtered_out_variants.tsv",
+#            prefix=PREFIX, sample=SAMPLES),
+
+#     expand("results/{prefix}/pass_alt_variants/{sample}_pass_alt_variants.tsv",
+#            prefix=PREFIX, sample=SAMPLES),
+
+#     expand("results/{prefix}/indel_prox_mask_vcf/{sample}/{sample}_indel_prox_mask.vcf.gz",
+#            prefix=PREFIX, sample=SAMPLES),
+
+#     expand("results/{prefix}/indel_prox_positions/{sample}_indel_prox_positions.tsv",
+#            prefix=PREFIX, sample=SAMPLES),
+
+#     expand("results/{prefix}/consensus_ref_allele_unmapped_variants/{sample}/{sample}_ref_allele_unmapped_variants.dash.fa",
+#            prefix=PREFIX, sample=SAMPLES),
+
+#     FINAL_MSA,
+# ]
+
+
+# final targets are:
+# merged pass SNP-only VCF
+# consensus VCF for each sample
+# consensus FASTA for each sample
+# full filtered VCF for each sample
+FULL_TARGETS = [
+    expand("results/{prefix}/merged_vcf/{prefix}_merged_pass_snp_only.vcf.gz",
+           prefix=PREFIX),
+
+    expand("results/{prefix}/consensus/{sample}/{sample}_pass_snp_only.vcf.gz",
            prefix=PREFIX, sample=SAMPLES),
 
-    expand("results/{prefix}/filtered_vcf/{sample}/{sample}_filter_snp_final.vcf.gz",
+    expand("results/{prefix}/consensus/{sample}/{sample}_consensus.fa",
            prefix=PREFIX, sample=SAMPLES),
 
-    expand("results/{prefix}/filtered_vcf/{sample}/{sample}_filter_indel_final.vcf.gz",
-           prefix=PREFIX, sample=SAMPLES),
-
-    expand("results/{prefix}/filtered_vcf/{sample}/{sample}_5bp_indel_removed.vcf.gz",
+    expand("results/{prefix}/filtered_vcf/{sample}/{sample}_bcftools_filtered_indelprox_lowcov.vcf.gz.tbi",
            prefix=PREFIX, sample=SAMPLES),
 ]
 
-FULL_TARGETS = VCF_ONLY_TARGETS + [
-    expand("results/{prefix}/unmapped_vcf/{sample}/{sample}_unmapped.vcf.gz",
-           prefix=PREFIX, sample=SAMPLES),
-
-    expand("results/{prefix}/unmapped_positions/{sample}_unmapped_positions.tsv",
-           prefix=PREFIX, sample=SAMPLES),
-
-    expand("results/{prefix}/filtered_mask_vcf/{sample}/{sample}_filtered_mask.vcf.gz",
-           prefix=PREFIX, sample=SAMPLES),
-
-    expand("results/{prefix}/filtered_out_variants/{sample}_filtered_out_variants.tsv",
-           prefix=PREFIX, sample=SAMPLES),
-
-    expand("results/{prefix}/pass_alt_variants/{sample}_pass_alt_variants.tsv",
-           prefix=PREFIX, sample=SAMPLES),
-
-    expand("results/{prefix}/indel_prox_mask_vcf/{sample}/{sample}_indel_prox_mask.vcf.gz",
-           prefix=PREFIX, sample=SAMPLES),
-
-    expand("results/{prefix}/indel_prox_positions/{sample}_indel_prox_positions.tsv",
-           prefix=PREFIX, sample=SAMPLES),
-
-    expand("results/{prefix}/consensus_ref_allele_unmapped_variants/{sample}/{sample}_ref_allele_unmapped_variants.dash.fa",
-           prefix=PREFIX, sample=SAMPLES),
-
-    FINAL_MSA,
-]
 
 if WORKFLOW_MODE == "vcf_only":
     FINAL_TARGETS = VCF_ONLY_TARGETS
@@ -154,9 +175,9 @@ include: "rules/9_variant_hard_filter.smk"
 include: "rules/10_remove_5_bp_snp_flanking_to_indels.smk"
 include: "rules/11_snpEff_annotation.smk"
 include: "rules/12_make_unmapped_vcfs.smk"
-include: "rules/13_make_filtered_mask_vcf.smk"
-include: "rules/14_phage_enabled.smk"
-include: "rules/15_make_indel_prox_mask_vcf.smk"
+#include: "rules/13_make_filtered_mask_vcf.smk"
+#include: "rules/14_phage_enabled.smk"
+#include: "rules/15_make_indel_prox_mask_vcf.smk"
 include: "rules/16_consensus_ref_allele_unmapped_variants.smk"
 include: "rules/17_apply_unmapped_dashes.smk"
 include: "rules/18_make_msa.smk"

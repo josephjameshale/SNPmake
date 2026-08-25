@@ -1,26 +1,48 @@
-# remove duplicates and sort and index bam file with duplicates removed 
-# NOTE: consider marking duplicates instead of removing them
-# this can be done by changing the -REMOVE_DUPLICATES parameter in the wrapper function's picard command
-rule post_align_remove_pcr_duplicates:
+
+# Note that duplicates are marked but not entirely removed in this step
+rule picard_remove_duplicates:
     input:
         sorted_bam_out = "results/{prefix}/post_align/{sample}/sorted_bam/{sample}_aln_sort.bam"
     output:
-        bam_duplicates_removed_out = temp("results/{prefix}/post_align/{sample}/remove_duplicates/{sample}_aln_marked.bam"),
-        dups_rmvd_sorted_bam_out = temp("results/{prefix}/post_align/{sample}/sorted_bam_dups_removed/{sample}_final.bam"),
-        dups_rmvd_sorted_bam_out_bai = temp("results/{prefix}/post_align/{sample}/sorted_bam_dups_removed/{sample}_final.bam.bai"),
+        picard_bam = temp("results/{prefix}/post_align/{sample}/picard_remove_duplicates/{sample}_aln_marked.bam"),
     params:
-        outdir_dups_removed = "results/{prefix}/post_align/{sample}/remove_duplicates",
-        outdir = "results/{prefix}/post_align/{sample}/sorted_bam_dups_removed/",
-        prefix = "{sample}"
+        picard_metrics_out = "results/{prefix}/post_align/{sample}/picard_remove_duplicates/{sample}_markduplicates_metrics"
     log:
-        picard_dups_log = "logs/{prefix}/post_align/{sample}/{sample}_picard.log",
-        post_align_remove_duplicates_log= "logs/{prefix}/post_align/{sample}/{sample}_samtools.log"
+        "logs/{prefix}/post_align/{sample}/{sample}_picard.log"
     benchmark: 
-        "benchmarks/{prefix}/post_align_remove_pcr_duplicates/{sample}.benchmark.tsv"
+        "benchmarks/{prefix}/picard_remove_duplicates/{sample}_picard.benchmark.tsv"
+    singularity:
+        "docker://broadinstitute/picard:3.5.0"
     threads: 2
     resources:
         mem_mb=5000,
         runtime=15
-    wrapper:
-        "file:workflow/wrapper_functions/post_align_remove_duplicates"
-    
+    shell:
+        """
+        picard MarkDuplicates -REMOVE_DUPLICATES false -INPUT {input.sorted_bam_out} -OUTPUT {output.picard_bam} -METRICS_FILE {params.picard_metrics_out} -CREATE_INDEX true -VALIDATION_STRINGENCY LENIENT &> {log}
+        """
+
+
+rule samtools_sort_index:
+    input:
+        picard_bam = "results/{prefix}/post_align/{sample}/picard_remove_duplicates/{sample}_aln_marked.bam"
+    output:
+        sorted_picard_bam = "results/{prefix}/post_align/{sample}/sorted_bam_dups_removed/{sample}_final.bam",
+        sorted_picard_bam_bai = "results/{prefix}/post_align/{sample}/sorted_bam_dups_removed/{sample}_final.bam.bai",
+    benchmark: 
+        "benchmarks/{prefix}/picard_remove_duplicates/{sample}_samtools.benchmark.tsv"
+    threads: 2
+    resources:
+        mem_mb=5000,
+        runtime=15
+    singularity:
+        "docker://staphb/samtools:1.24"
+    params:
+        temp_dir = "results/{prefix}/post_align/{sample}/sorted_bam_dups_removed/{sample}_aln_sort_temp",
+        sub_threads = lambda wildcards, threads: max(0, threads - 1),
+    shell:
+        """
+        samtools sort {input.picard_bam} -m 500M -@ {params.sub_threads} -o {output.sorted_picard_bam} -T {params.temp_dir}
+        samtools index {output.sorted_picard_bam}
+        """
+

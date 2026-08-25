@@ -1,3 +1,5 @@
+
+# note that -M was removed from the bwa-mem command
 rule align_reads:
     input:
         r1=align_r1,
@@ -5,7 +7,8 @@ rule align_reads:
     output:
         aligned_sam_out=temp("results/{prefix}/align_reads/{sample}/{sample}_aln.sam")
     params:
-        ref_genome=config["reference_genome"]
+        ref_genome=config["reference_genome"],
+        readgroup= lambda wildcards: f"@RG\\tID:{wildcards.sample}\\tSM:{wildcards.sample}\\tLB:{wildcards.sample}\\tPL:ILLUMINA"
     log:
         "logs/{prefix}/align_reads/{sample}/{sample}.log"
     singularity:
@@ -20,13 +23,5 @@ rule align_reads:
         r"""
         set -euo pipefail
         mkdir -p $(dirname {log})
-
-        bash workflow/scripts/align_reads.sh \
-            {input.r1} \
-            {threads} \
-            {params.ref_genome} \
-            {input.r1} \
-            {input.r2} \
-            {output.aligned_sam_out} \
-            > {log} 2>&1
+        bwa mem -R "{params.readgroup}" -t {threads} {params.ref_genome} {input.r1} {input.r2} > {output.aligned_sam_out} 2> {log}
         """

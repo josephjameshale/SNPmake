@@ -201,26 +201,5 @@ snakemake -s workflow/Snakefile --profile profile --configfile config/config.yam
 
 ## Dependencies
 
-### Near Essential
-
-* [Snakemake](https://snakemake.readthedocs.io/en/stable/)
-* [Conda](https://docs.conda.io/en/latest/)
-* [mamba](https://mamba.readthedocs.io/en/latest/)
-
-### Tool stack used in workflow
-
-* [Trimmomatic](https://github.com/usadellab/Trimmomatic)
-* [seqtk](https://github.com/lh3/seqtk)
-* [BWA](https://github.com/lh3/bwa)
-* [samtools](https://github.com/samtools/samtools)
-* [bcftools](https://samtools.github.io/bcftools/)
-* [GATK](https://gatk.broadinstitute.org/)
-* [bedtools](https://bedtools.readthedocs.io/)
-* [Picard](https://broadinstitute.github.io/picard/)
-* [snpEff](https://pcingola.github.io/SnpEff/)
-* [htslib](https://www.htslib.org/)
-* [pigz](https://zlib.net/pigz/)
-* [Pandas](https://pandas.pydata.org/)
-* [Biopython](https://biopython.org/)
-
+(in progress)
 

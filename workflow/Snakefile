@@ -147,6 +147,9 @@ FULL_TARGETS = [
 
     expand("results/{prefix}/filtered_vcf/{sample}/{sample}_bcftools_filtered_indelprox_lowcov.vcf.gz.tbi",
            prefix=PREFIX, sample=SAMPLES),
+    
+    expand("results/{prefix}/merged_vcf/{prefix}_merged_pass_snp_only_filtered.vcf.gz",
+           prefix=PREFIX),
 ]
 
 
@@ -179,6 +182,7 @@ include: "rules/12_make_unmapped_vcfs.smk"
 #include: "rules/14_phage_enabled.smk"
 #include: "rules/15_make_indel_prox_mask_vcf.smk"
 include: "rules/16_consensus_ref_allele_unmapped_variants.smk"
+include: "rules/17_generate_snp_data.smk"
 #include: "rules/17_apply_unmapped_dashes.smk"
 include: "rules/18_make_msa.smk"
 include: "rules/19_merge_with_existing_msa.smk" 

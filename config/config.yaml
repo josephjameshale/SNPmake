@@ -2,7 +2,7 @@
 
 # Directory prefix where the outputs will be saved to
 # Rename this to your preferred naming convention with this format:year-month-day_Project_Name_SNPmake
-prefix: 2026-08-19_CladeIV_clincal_h9h_validation_v1
+prefix: 2026-08-19_CladeIV_clincal_h9h_validation_v2
 
 # Relative path where your samples are found
 samples: config/samples_clinical_cIV_validation_only.csv
@@ -49,6 +49,10 @@ mq_indel_filter: 50
 dp_indel_filter: 9
 ad_indel_filter_alt_depth: 9
 ad_indel_filter_ratio: 0.9
+
+# SNP fail percentage threshold
+# variants that fail QC in at least this percentage of isolates will be excluded from all isolates
+fail_threshold: 80.0
 
 #snpEff
 snpEff_path: 

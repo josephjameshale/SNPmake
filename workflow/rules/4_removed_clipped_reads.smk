@@ -4,7 +4,6 @@ rule samtools_sam_to_bam:
         aligned_sam_out = "results/{prefix}/align_reads/{sample}/{sample}_aln.sam",
         ref_genome= config["reference_genome"],
     output:
-        bam_out = temp("results/{prefix}/post_align/{sample}/aligned_bam/{sample}_aln.bam"),
         sorted_bam_out = temp("results/{prefix}/post_align/{sample}/sorted_bam/{sample}_aln_sort.bam")
     log:
         "logs/{prefix}/post_align/{sample}/{sample}_samtools.log",

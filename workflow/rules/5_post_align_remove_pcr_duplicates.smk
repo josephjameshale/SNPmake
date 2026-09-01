@@ -19,7 +19,7 @@ rule picard_remove_duplicates:
         runtime=15
     shell:
         """
-        picard MarkDuplicates -REMOVE_DUPLICATES false -INPUT {input.sorted_bam_out} -OUTPUT {output.picard_bam} -METRICS_FILE {params.picard_metrics_out} -CREATE_INDEX true -VALIDATION_STRINGENCY LENIENT &> {log}
+        java -jar /usr/picard/picard.jar MarkDuplicates -REMOVE_DUPLICATES false -INPUT {input.sorted_bam_out} -OUTPUT {output.picard_bam} -METRICS_FILE {params.picard_metrics_out} -CREATE_INDEX true -VALIDATION_STRINGENCY LENIENT &> {log}
         """
 
 

@@ -13,13 +13,13 @@ rule picard_remove_duplicates:
         "benchmarks/{prefix}/picard_remove_duplicates/{sample}_picard.benchmark.tsv"
     singularity:
         "docker://broadinstitute/picard:3.5.0"
-    threads: 2
+    threads: 1
     resources:
-        mem_mb=5000,
-        runtime=15
+        mem_mb=20000,
+        runtime=120
     shell:
         """
-        java -jar /usr/picard/picard.jar MarkDuplicates -REMOVE_DUPLICATES false -INPUT {input.sorted_bam_out} -OUTPUT {output.picard_bam} -METRICS_FILE {params.picard_metrics_out} -CREATE_INDEX true -VALIDATION_STRINGENCY LENIENT &> {log}
+        java -Xmx8g -jar /usr/picard/picard.jar MarkDuplicates -REMOVE_DUPLICATES false -INPUT {input.sorted_bam_out} -OUTPUT {output.picard_bam} -METRICS_FILE {params.picard_metrics_out} -CREATE_INDEX true -VALIDATION_STRINGENCY LENIENT &> {log}
         """
 
 

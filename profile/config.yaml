@@ -1,7 +1,7 @@
 # profile/config.yaml
 
 # General snakemake parameters
-use-conda: false
+use-conda: true
 use-singularity: true
 use-envmodules: true
 printshellcmds: true

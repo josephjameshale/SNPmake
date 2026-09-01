@@ -11,7 +11,7 @@ SAMPLES = list(samples_df["sample_id"])
 
 PREFIX = config["prefix"]
 REF_GENOME = config["reference_genome"]
-REF_CONTIG = config["reference_contig"]
+#REF_CONTIG = config["reference_contig"]
 
 READ_INPUT_TYPE = config.get("read_input_type", "raw")
 WORKFLOW_MODE = config.get("workflow_mode", "full")
@@ -147,8 +147,11 @@ FULL_TARGETS = [
 
     expand("results/{prefix}/filtered_vcf/{sample}/{sample}_bcftools_filtered_indelprox_lowcov.vcf.gz.tbi",
            prefix=PREFIX, sample=SAMPLES),
-    
+
     expand("results/{prefix}/merged_vcf/{prefix}_merged_pass_snp_only_filtered.vcf.gz",
+           prefix=PREFIX),
+
+    expand("results/{prefix}/alignment/{prefix}_consensus_msa.fa",
            prefix=PREFIX),
 ]
 
@@ -185,5 +188,5 @@ include: "rules/16_consensus_ref_allele_unmapped_variants.smk"
 include: "rules/17_generate_snp_data.smk"
 #include: "rules/17_apply_unmapped_dashes.smk"
 include: "rules/18_make_msa.smk"
-include: "rules/19_merge_with_existing_msa.smk" 
+#include: "rules/19_merge_with_existing_msa.smk" 
 

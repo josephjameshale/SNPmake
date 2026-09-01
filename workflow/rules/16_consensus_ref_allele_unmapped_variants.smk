@@ -14,7 +14,7 @@ rule build_all_fail_bed:
     shell:
         """
         ### Note that only SNPs are included here!!
-        bcftools query -i 'FILTER!="PASS" && TYPE="snp"' -f '%CHROM\t%POS0\t%END\n' {input.vcf_indelprox_lowcov} > {output.all_fail_bed}
+        bcftools query -i 'FILTER!="PASS" && TYPE="snp" && GT="alt"' -f '%CHROM\t%POS0\t%POS\n' {input.vcf_indelprox_lowcov} > {output.all_fail_bed}
         """
 
 
@@ -23,6 +23,7 @@ rule combine_bed_masks:
         all_fail_bed = "results/{prefix}/bedtools/{sample}/{sample}_all_fail.bed",
         lowcoverage_bed = "results/{prefix}/bedtools/{sample}/{sample}_lowcoverage.bed.gz",
         lowcoverage_bed_tbi = "results/{prefix}/bedtools/{sample}/{sample}_lowcoverage.bed.gz.tbi",
+        sorted_cohort_fail_bed = "results/{prefix}/consensus/{prefix}_cohort_fail_sorted.bed",
     output:
         final_bed = "results/{prefix}/bedtools/{sample}/{sample}_final.bed",
     singularity:
@@ -34,7 +35,7 @@ rule combine_bed_masks:
     shell:
         """
         # combine the all_fail_bed with the first three columns of the lowcoverage_bed file, and sort and merge the intervals
-        cat {input.all_fail_bed} <(zcat {input.lowcoverage_bed} | cut -f1-3) | bedtools sort -i - | bedtools merge -i - > {output.final_bed}
+        cat {input.all_fail_bed} {input.sorted_cohort_fail_bed} <(zcat {input.lowcoverage_bed} | cut -f1-3) | bedtools sort -i - | bedtools merge -i - > {output.final_bed}
         """
 
 
@@ -62,7 +63,7 @@ rule consensus_fasta:
         """
 
         ### Note that the command below extracts only SNPs!! Indels will not be included in the final vcf or fasta file.
-        bcftools view -f PASS -v snps -i 'GT="alt"' -Oz -o {output.vcf_consensus} {input.vcf_indelprox_lowcov}
+        bcftools view -f PASS -v snps -i 'GT="alt"' -T ^{input.final_bed} -Oz -o {output.vcf_consensus} {input.vcf_indelprox_lowcov}
         bcftools index -f -t {output.vcf_consensus}
 
         # ensure that there are no duplicated positions in this vcf file
@@ -74,7 +75,7 @@ rule consensus_fasta:
 
         # make a consensus fasta file from the vcf file, masking low-coverage positions with N
         VCF_SAMPLE=$(bcftools query -l {output.vcf_consensus} | head -n 1)
-        bcftools consensus -f {input.ref_genome} -s $VCF_SAMPLE -p {wildcards.sample}_ -m {input.final_bed} --mask-with N {output.vcf_consensus} > {output.fasta}
+        bcftools consensus -f {input.ref_genome} -s $VCF_SAMPLE -m {input.final_bed} --mask-with N {output.vcf_consensus} > {output.fasta}
         """
 
 

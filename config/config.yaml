@@ -16,7 +16,7 @@ workflow_mode: full    # options: full, vcf-only
 
 # Path to the reference genome
 reference_genome: reference/telomere_mask_NoConcat_v3/Lojek_H9H_1/Lojek_H9H_1.fasta
-reference_contig: Lojek_H9H_1
+reference_name: Lojek_H9H_1
 
 # Set the estimated genome size for coverage calculations 
 genome_size: 12400000

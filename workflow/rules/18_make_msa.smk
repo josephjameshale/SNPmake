@@ -27,23 +27,60 @@ rule merge_vcf:
         """
 
 
+# concatenate the contigs in the reference genome
+rule concatenate_reference_contigs:
+    input:
+        ref=REF_GENOME,
+    output:
+        ref_concat="results/{prefix}/consensus/{prefix}_ref_concat.fasta",
+        contig_order="results/{prefix}/consensus/{prefix}_ref_contig_order.tsv",
+    threads: 1
+    resources:
+        mem_mb=1000,
+        runtime=10
+    params:
+        reference_name = config["reference_name"],
+    conda:
+        "envs/concatenate_contigs.yaml"
+    shell:
+        """
+        python3.13 workflow/scripts/concatenate_contigs.py --input {input.ref} --output {output.ref_concat} --contig_order {output.contig_order} --sample_name {params.reference_name} --mode reference
+        """
 
+# concatenate the contigs in each sample consensus fasta file
+rule concatenate_sample_contigs:
+    input:
+        consensus_fasta="results/{prefix}/consensus/{sample}/{sample}_consensus.fa",
+        contig_order="results/{prefix}/consensus/{prefix}_ref_contig_order.tsv",
+    output:
+        sample_concat="results/{prefix}/consensus/{sample}/{sample}_consensus_concat.fa",
+    threads: 1
+    resources:
+        mem_mb=1000,
+        runtime=10
+    conda:
+        "envs/concatenate_contigs.yaml"
+    shell:
+        """
+        python3.13 workflow/scripts/concatenate_contigs.py --input {input.consensus_fasta} --output {output.sample_concat} --contig_order {input.contig_order} --sample_name {wildcards.sample} --mode sample
+        """
 
-# original method to make msa files - probably not applicable to a reference with multiple contigs
-# rule make_msa:
-#     input:
-#         ref=REF_GENOME,
-#         cons=expand(
-#             "results/{prefix}/consensus/{sample}/{sample}_consensus.fa",
-#             sample=SAMPLES, prefix=PREFIX
-#         )
-#     output:
-#         msa="results/{prefix}/alignment/{prefix}_consensus_msa.fa"
-#     threads: 1
-#     resources:
-#         mem_mb=1000,
-#         runtime=180
-#     shell:
-#         """
-#         cat {input.ref} {input.cons} > {output.msa}
-#         """
+# combine the concatenated reference and sample fasta files into a single msa file
+rule make_msa:
+    input:
+        ref_concat="results/{prefix}/consensus/{prefix}_ref_concat.fasta",
+        sample_concat=expand(
+            "results/{prefix}/consensus/{sample}/{sample}_consensus_concat.fa",
+            sample=SAMPLES, prefix=PREFIX
+        ),
+    output:
+        msa="results/{prefix}/alignment/{prefix}_consensus_msa.fa",
+    threads: 1
+    resources:
+        mem_mb=1000,
+        runtime=10,
+    shell:
+        """
+        cat {input.ref_concat} {input.sample_concat} > {output.msa}
+        """
+

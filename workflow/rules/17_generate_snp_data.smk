@@ -15,11 +15,11 @@ rule snp_data_isolate:
             runtime=10
     shell:
         r"""
-        {{
+        {
             printf 'CHROM\tPOS\t%s\n' {wildcards.sample}
 
             bcftools query --include 'TYPE="snp" && GT="alt"' --format '%CHROM\t%POS\t%FILTER\n' {input.vcf_indelprox_lowcov}
-        }} > {output.snp_data_isolate}
+        } > {output.snp_data_isolate}
         """
 
 
@@ -32,7 +32,7 @@ rule merge_snp_data:
         ),
     output:
         merged_snp_data="results/{prefix}/consensus/{prefix}_merged_snp_data.tsv",
-        fail_bed="results/{prefix}/consensus/{prefix}_fail.bed",
+        fail_bed="results/{prefix}/consensus/{prefix}_cohort_fail.bed",
     params:
         fail_threshold = config["fail_threshold"],
     threads: 1
@@ -48,10 +48,10 @@ rule merge_snp_data:
 # use bedtools to sort the fail_bed file
 rule bedtools_sort_fail_bed:
     input:
-        fail_bed="results/{prefix}/consensus/{prefix}_fail.bed",
+        fail_bed="results/{prefix}/consensus/{prefix}_cohort_fail.bed",
         ref_genome_fai = config["reference_genome"] + ".fai",
     output:
-        fail_bed_sorted="results/{prefix}/consensus/{prefix}_fail_sorted.bed",
+        fail_bed_sorted="results/{prefix}/consensus/{prefix}_cohort_fail_sorted.bed",
     singularity:
         "docker://staphb/bedtools:2.31.1"
     shell:
@@ -65,7 +65,7 @@ rule mask_fail_positions:
     input:
         merged_vcf="results/{prefix}/merged_vcf/{prefix}_merged_pass_snp_only.vcf.gz",
         merged_vcf_tbi="results/{prefix}/merged_vcf/{prefix}_merged_pass_snp_only.vcf.gz.tbi",
-        fail_bed_sorted="results/{prefix}/consensus/{prefix}_fail_sorted.bed",
+        fail_bed_sorted="results/{prefix}/consensus/{prefix}_cohort_fail_sorted.bed",
     output:
         merged_filtered_vcf="results/{prefix}/merged_vcf/{prefix}_merged_pass_snp_only_filtered.vcf.gz",
         merged_filtered_vcf_tbi="results/{prefix}/merged_vcf/{prefix}_merged_pass_snp_only_filtered.vcf.gz.tbi",

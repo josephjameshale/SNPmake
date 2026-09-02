@@ -15,11 +15,11 @@ rule snp_data_isolate:
             runtime=10
     shell:
         r"""
-        {
+        (
             printf 'CHROM\tPOS\t%s\n' {wildcards.sample}
 
             bcftools query --include 'TYPE="snp" && GT="alt"' --format '%CHROM\t%POS\t%FILTER\n' {input.vcf_indelprox_lowcov}
-        } > {output.snp_data_isolate}
+        ) > {output.snp_data_isolate}
         """
 
 

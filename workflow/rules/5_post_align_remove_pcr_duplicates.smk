@@ -34,7 +34,7 @@ rule samtools_sort_index:
     threads: 2
     resources:
         mem_mb=5000,
-        runtime=15
+        runtime=45
     singularity:
         "docker://staphb/samtools:1.24"
     params:

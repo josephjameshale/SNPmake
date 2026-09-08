@@ -9,7 +9,7 @@ samples: config/samples_clinical_cIV_validation_only.csv
 
 # raw or trimmed
 read_input_type: trimmed   # options: raw or trimmed
-input_reads: temp_reads_dir_clinical/clade_IV/
+input_reads: temp_reads_dir_mdhhs/clade_IV/
 
 # run mode
 workflow_mode: full    # options: full, vcf-only
@@ -35,6 +35,12 @@ window_size_quality: 20
 minlength: 40
 headcrop_length: 0
 
+# scaffold masking settings
+# set the number of bases to be masked at the beginning and end of each scaffold/contig
+scaffold_mask_size: 5000
+# set the number of bases to retain around each feature (such as a gene or a CDS)
+# note that this requires a gff file to be included in the same directory as the reference fasta file
+feature_buffer_size: 2000
 
 # QC filters for bcftools filtering of SNPs
 qual_snp_filter: 100

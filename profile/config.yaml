@@ -9,6 +9,8 @@ latency-wait: 100
 nolock: true
 conda-frontend: conda
 jobs: 50
+max-jobs-per-second: 1
+max-status-checks-per-second: 1
 
 # Slurm parameters
 slurm: True

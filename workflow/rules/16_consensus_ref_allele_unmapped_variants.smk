@@ -21,8 +21,8 @@ rule build_all_fail_bed:
 rule combine_bed_masks:
     input:
         all_fail_bed = "results/{prefix}/bedtools/{sample}/{sample}_all_fail.bed",
-        lowcoverage_bed = "results/{prefix}/bedtools/{sample}/{sample}_lowcoverage.bed.gz",
-        lowcoverage_bed_tbi = "results/{prefix}/bedtools/{sample}/{sample}_lowcoverage.bed.gz.tbi",
+        lowcoverage_bed = "results/{prefix}/bedtools/{sample}/{sample}_final_mask.bed.gz",
+        lowcoverage_bed_tbi = "results/{prefix}/bedtools/{sample}/{sample}_final_mask.bed.gz.tbi",
         sorted_cohort_fail_bed = "results/{prefix}/consensus/{prefix}_cohort_fail_sorted.bed",
     output:
         final_bed = "results/{prefix}/bedtools/{sample}/{sample}_final.bed",

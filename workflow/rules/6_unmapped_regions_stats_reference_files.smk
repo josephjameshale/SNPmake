@@ -33,14 +33,15 @@ rule make_scaffold_mask_bed:
     params:
         scaffold_mask_size = config["scaffold_mask_size"],
         feature_buffer_size = config["feature_buffer_size"],
-        filter_label = "SCAFFOLD_MASK",
+        #filter_label = "SCAFFOLD_MASK",
+        filter_label = "FAIL_LOW_COVERAGE",
     conda:
         "envs/bioconda_gffutils.yaml"
     shell:
         """
         python3.13 workflow/scripts/make_scaffold_mask_bed.py --input {input.ref} --output {output.scaffold_mask_bed_temp} \
         --scaffold_mask_size {params.scaffold_mask_size} --feature_buffer_size {params.feature_buffer_size}
-        # add a fourth column to the bed file that simply contains the label "SCAFFOLD_MASK"
+        # add a fourth column to the bed file that contains the label (which is currently the same as low coverage)
         awk -v label={params.filter_label} 'BEGIN {{OFS="\t"}} {{print $1, $2, $3, label}}' {output.scaffold_mask_bed_temp} > {output.scaffold_mask_bed}
         """
 

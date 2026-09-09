@@ -40,7 +40,7 @@ headcrop_length: 0
 scaffold_mask_size: 5000
 # set the number of bases to retain around each feature (such as a gene or a CDS)
 # note that this requires a gff file to be included in the same directory as the reference fasta file
-feature_buffer_size: 2000
+feature_buffer_size: 500
 
 # QC filters for bcftools filtering of SNPs
 qual_snp_filter: 100

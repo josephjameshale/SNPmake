@@ -4,7 +4,6 @@ import argparse
 import gffutils as gff
 from Bio import SeqIO
 
-
 def find_files(input_dir):
     fasta_fname, gff_fname = None, None
     # input_dir may actually be provided as a path to a fasta file

@@ -84,3 +84,32 @@ rule make_msa:
         cat {input.ref_concat} {input.sample_concat} > {output.msa}
         """
 
+
+
+
+# merge the indel vcf files for each sample
+rule merge_vcf_indel:
+    input:
+        ref=REF_GENOME,
+        vcfs=expand(
+            "results/{prefix}/consensus/{sample}/{sample}_pass_indel_only.vcf.gz",
+            sample=SAMPLES, prefix=PREFIX
+        ),
+        vcf_tbis=expand(
+            "results/{prefix}/consensus/{sample}/{sample}_pass_indel_only.vcf.gz.tbi",
+            sample=SAMPLES, prefix=PREFIX
+        ),
+    output:
+        merged_vcf="results/{prefix}/merged_vcf/{prefix}_merged_pass_indel_only.vcf.gz",
+        merged_vcf_tbi="results/{prefix}/merged_vcf/{prefix}_merged_pass_indel_only.vcf.gz.tbi",
+    singularity:
+        "docker://staphb/bcftools:1.23.1"
+    threads: 1
+    resources:
+        mem_mb=1000,
+        runtime=180
+    shell:
+        """
+        bcftools merge -Oz -o {output.merged_vcf} {input.vcfs}
+        bcftools index -f -t {output.merged_vcf}
+        """

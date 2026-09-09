@@ -80,3 +80,33 @@ rule consensus_fasta:
 
 
 
+
+rule indel_vcf:
+    input:
+        vcf_indelprox_lowcov="results/{prefix}/filtered_vcf/{sample}/{sample}_bcftools_filtered_indelprox_lowcov.vcf.gz",
+        vcf_indexprox_lowcov_tbi="results/{prefix}/filtered_vcf/{sample}/{sample}_bcftools_filtered_indelprox_lowcov.vcf.gz.tbi",
+        #final_bed = "results/{prefix}/bedtools/{sample}/{sample}_final.bed",
+        #ref_genome = config["reference_genome"],
+        lowcoverage_bed = "results/{prefix}/bedtools/{sample}/{sample}_final_mask.bed.gz",
+        lowcoverage_bed_tbi = "results/{prefix}/bedtools/{sample}/{sample}_final_mask.bed.gz.tbi",
+    output:
+        indel_vcf = "results/{prefix}/consensus/{sample}/{sample}_pass_indel_only.vcf.gz",
+        indel_vcf_tbi = "results/{prefix}/consensus/{sample}/{sample}_pass_indel_only.vcf.gz.tbi",
+    singularity:
+        "docker://staphb/bcftools:1.23.1"
+    benchmark: 
+        "benchmarks/{prefix}/consensus_ref_allele_unmapped_variants/{sample}.benchmark.tsv"
+    threads: 1
+    resources:
+            mem_mb=1000,
+            runtime=10
+    shell:
+        """
+
+        ### Note that the command below extracts only indels!! SNPs are in a separate output file
+        bcftools view -f PASS -v indels -i 'GT="alt"' -T ^{input.lowcoverage_bed} -Oz -o {output.indel_vcf} {input.vcf_indelprox_lowcov}
+        bcftools index -f -t {output.indel_vcf}
+        """
+
+
+

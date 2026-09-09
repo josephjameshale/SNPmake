@@ -151,6 +151,9 @@ FULL_TARGETS = [
     expand("results/{prefix}/merged_vcf/{prefix}_merged_pass_snp_only_filtered.vcf.gz",
            prefix=PREFIX),
 
+    expand("results/{prefix}/merged_vcf/{prefix}_merged_pass_indel_only_filtered.vcf.gz",
+           prefix=PREFIX),
+
     expand("results/{prefix}/alignment/{prefix}_consensus_msa.fa",
            prefix=PREFIX),
 ]

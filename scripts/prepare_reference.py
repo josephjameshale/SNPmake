@@ -94,7 +94,7 @@ def main():
     parser.add_argument(
         '--singularity_repeatmasker','-s',type=str,
         help='''Provide a path to the singluarity container with RepeatMasker.''',
-        default='/nfs/turbo/umms-esnitkin/Project_Cauris/Analysis/2025_funQCD_database/tetools_2.0.0_07-15-26.sif'
+        default='/nfs/turbo/umms-esnitkin/Project_Cauris/Analysis/2025_funQCD_database/singularity_containers/tetools_2.0.0_07-15-26.sif'
         )
     parser.add_argument(
         '--repeatmasker_lib','-r',type=str,

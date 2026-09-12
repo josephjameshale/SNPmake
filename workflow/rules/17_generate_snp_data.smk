@@ -61,25 +61,26 @@ rule bedtools_sort_fail_bed:
 
 
 # remove the positions that overlap with the fail_bed file from the merged vcf file
-rule mask_fail_positions:
-    input:
-        merged_vcf="results/{prefix}/merged_vcf/{prefix}_merged_pass_snp_only.vcf.gz",
-        merged_vcf_tbi="results/{prefix}/merged_vcf/{prefix}_merged_pass_snp_only.vcf.gz.tbi",
-        fail_bed_sorted="results/{prefix}/consensus/{prefix}_cohort_fail_sorted.bed",
-    output:
-        merged_filtered_vcf="results/{prefix}/merged_vcf/{prefix}_merged_pass_snp_only_filtered.vcf.gz",
-        merged_filtered_vcf_tbi="results/{prefix}/merged_vcf/{prefix}_merged_pass_snp_only_filtered.vcf.gz.tbi",
-    singularity:
-        "docker://staphb/bcftools:1.23.1"
-    threads: 1
-    resources:
-            mem_mb=1000,
-            runtime=10
-    shell:
-        """
-        bcftools view -T ^{input.fail_bed_sorted} -Oz -o {output.merged_filtered_vcf} {input.merged_vcf}
-        bcftools index -f -t {output.merged_filtered_vcf}
-        """
+# this step is not needed - the cohort fail bed file is already included in combine_bed_masks and thus in consensus_fasta
+# rule mask_fail_positions:
+#     input:
+#         merged_vcf="results/{prefix}/merged_vcf/{prefix}_merged_pass_snp_only.vcf.gz",
+#         merged_vcf_tbi="results/{prefix}/merged_vcf/{prefix}_merged_pass_snp_only.vcf.gz.tbi",
+#         fail_bed_sorted="results/{prefix}/consensus/{prefix}_cohort_fail_sorted.bed",
+#     output:
+#         merged_filtered_vcf="results/{prefix}/merged_vcf/{prefix}_merged_pass_snp_only_filtered.vcf.gz",
+#         merged_filtered_vcf_tbi="results/{prefix}/merged_vcf/{prefix}_merged_pass_snp_only_filtered.vcf.gz.tbi",
+#     singularity:
+#         "docker://staphb/bcftools:1.23.1"
+#     threads: 1
+#     resources:
+#             mem_mb=1000,
+#             runtime=10
+#     shell:
+#         """
+#         bcftools view -T ^{input.fail_bed_sorted} -Oz -o {output.merged_filtered_vcf} {input.merged_vcf}
+#         bcftools index -f -t {output.merged_filtered_vcf}
+#         """
 
 
 

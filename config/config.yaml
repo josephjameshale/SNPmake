@@ -2,21 +2,22 @@
 
 # Directory prefix where the outputs will be saved to
 # Rename this to your preferred naming convention with this format:year-month-day_Project_Name_SNPmake
-prefix: 2026-08-19_CladeIV_clincal_h9h_validation_v2
+prefix: 2026-09-09_tps1evo_mini
 
 # Relative path where your samples are found
-samples: config/samples_clinical_cIV_validation_only.csv
+samples: config/samples.csv
 
 # raw or trimmed
-read_input_type: trimmed   # options: raw or trimmed
-input_reads: temp_reads_dir_mdhhs/clade_IV/
+read_input_type: raw   # options: raw or trimmed
+input_reads: temp_reads_dir_mini
 
 # run mode
 workflow_mode: full    # options: full, vcf-only
 
 # Path to the reference genome
-reference_genome: reference/telomere_mask_NoConcat_v3/Lojek_H9H_1/Lojek_H9H_1.fasta
-reference_name: Lojek_H9H_1
+reference_genome: reference/mask_v4/b8441/b8441.fasta
+reference_name: b8441
+snpeff_config: reference/mask_v4/b8441/snpeff/snpEff.config
 
 # Set the estimated genome size for coverage calculations 
 genome_size: 12400000

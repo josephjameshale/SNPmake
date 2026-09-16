@@ -17,7 +17,7 @@ slurm: True
 
 # Default slurm resources
 default-resources:
-  - slurm_account=esnitkin1
+  - slurm_account=tromeara0
   - slurm_partition=standard
   - runtime=90
   - mem_mb=5000

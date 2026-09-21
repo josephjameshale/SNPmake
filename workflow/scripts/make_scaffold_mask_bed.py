@@ -10,7 +10,9 @@ def find_files(input_dir):
     if os.path.isfile(input_dir) and (input_dir.endswith('.fasta') or input_dir.endswith('.fa')):
         input_dir = os.path.dirname(input_dir)
     for fname in os.listdir(input_dir):
-        if fname.endswith('.fasta') or fname.endswith('.fa'):
+        if fname.endswith('.proteins.fa') or fname.endswith('.proteins.fasta'):
+            continue
+        elif fname.endswith('.fasta') or fname.endswith('.fa'):
             if fasta_fname is not None:
                 print(f'Error: found multiple fasta files in {input_dir}: {fasta_fname} and {fname}')
                 quit(1)

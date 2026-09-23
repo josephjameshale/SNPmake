@@ -3,18 +3,31 @@ import argparse
 import subprocess
 
 def make_dist_matrix(input_dir):
+    msa_fname = None
     # find the .msa file in the alignment subdirectory
     alignment_dir = os.path.join(input_dir, 'alignment')
-    msa_fname = None
-    for fname in os.listdir(alignment_dir):
-        if fname.endswith('.fa'):
-            msa_fname = os.path.join(alignment_dir, fname)
-            break
+    if os.path.isdir(alignment_dir):
+        for fname in os.listdir(alignment_dir):
+            if fname.endswith('.fa'):
+                if msa_fname is None:
+                    msa_fname = os.path.join(alignment_dir, fname)
+                else:
+                    raise ValueError(f'Multiple .fa files found in {alignment_dir}. Please ensure there is only one MSA file.')
+    # if the msa file is not found, search through the input directory
+    if msa_fname is None:
+        for fname in os.listdir(input_dir):
+            if fname.endswith('.fa'):
+                if msa_fname is None:
+                    msa_fname = os.path.join(input_dir, fname)
+                else:
+                    raise ValueError(f'Multiple .fa files found in {input_dir}. Please ensure there is only one MSA file.')
     if msa_fname is None:
         print(f'Error: could not find the MSA file in {alignment_dir}')
         quit(1)
+    # write all output files to the directory that contains the MSA file
+    alignment_dir = os.path.dirname(msa_fname)
     # run snp-sites to reduce the msa to only variant sites
-    fname = os.path.basename(msa_fname).split('_consensus_msa')[0]
+    fname = os.path.basename(msa_fname).split('.fa')[0].split('_consensus_msa')[0]
     msa_var_fname = os.path.join(alignment_dir, f'{fname}_variant_only_alignment.fa')
     cmd1 = ['snp-sites', '-o', msa_var_fname, msa_fname]
     subprocess.run(cmd1)

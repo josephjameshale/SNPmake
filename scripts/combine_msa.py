@@ -1,25 +1,40 @@
 
 import argparse
 import os
+import shutil
 from Bio import SeqIO
 
 def find_files(input_dir, prefix, mode):
     if mode == 'msa':
         msa_name = None
+        # search through the alignment subdirectory
         msa_dir = os.path.join(input_dir,'alignment')
-        for f in os.listdir(msa_dir):
-            if f == f'{prefix}_consensus_msa.fa':
-                msa_name = os.path.join(msa_dir, f)
+        if os.path.isdir(msa_dir):
+            for f in os.listdir(msa_dir):
+                if f == f'{prefix}_consensus_msa.fa':
+                    msa_name = os.path.join(msa_dir, f)
+        # if the msa file is not found, search through the input directory
+        if msa_name is None:
+            for f in os.listdir(input_dir):
+                if f == f'{prefix}_consensus_msa.fa':
+                    msa_name = os.path.join(input_dir, f)
         if msa_name is None:
             print(f'Error: could not locate {prefix}_consensus_msa.fa in {msa_dir}')
             quit(1)
         return msa_name
     if mode == 'contig_order':
         contig_order_name = None
+        # search through the consensus subdirectory
         con_dir = os.path.join(input_dir,'consensus')
-        for f in os.listdir(con_dir):
-            if f == f'{prefix}_ref_contig_order.tsv':
-                contig_order_name = os.path.join(con_dir, f)
+        if os.path.isdir(con_dir):
+            for f in os.listdir(con_dir):
+                if f == f'{prefix}_ref_contig_order.tsv':
+                    contig_order_name = os.path.join(con_dir, f)
+        # if the contig order file is not found, search through the input directory
+        if contig_order_name is None:
+            for f in os.listdir(input_dir):
+                if f == f'{prefix}_ref_contig_order.tsv':
+                    contig_order_name = os.path.join(input_dir, f)
         if contig_order_name is None:
             print(f'Error: could not locate {prefix}_ref_contig_order.tsv in {con_dir}')
             quit(1)
@@ -101,17 +116,17 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--input1','-i1',type=str,
-        help='''Provide one SNPmake output directory.''',
+        help='''Provide one SNPmake output directory, or any directory containing MSA and contig order files. Directory name should be unique.''',
         required=True
         )
     parser.add_argument(
         '--input2','-i2',type=str,
-        help='''Provide a second SNPmake output directory.''',
+        help='''Provide a second SNPmake output directory, or any directory containing MSA and contig order files. Directory name should be unique.''',
         required=True
         )
     parser.add_argument(
         '--output','-o',type=str,
-        help='''Provide an output path for the combined multiple sequence alignment.''',
+        help='''Provide an output directory for the combined multiple sequence alignment.''',
         required=True
         )
     args = parser.parse_args()
@@ -122,8 +137,20 @@ def main():
     contig_order1 = find_files(args.input1, prefix1, 'contig_order')
     contig_order2 = find_files(args.input2, prefix2, 'contig_order')
     check_contig_order(contig_order1, contig_order2)
-    combine_msa(msa1, msa2, args.output)
-
+    # if all checks were passed, make the output directories
+    if not os.path.exists(args.output):
+        os.makedirs(args.output)
+    prefix_output_dir = os.path.join(args.output, f'{prefix1}_{prefix2}')
+    if not os.path.exists(prefix_output_dir):
+        os.makedirs(prefix_output_dir)
+    # make the output MSA and contig files in the same format as the input files
+    output_msa = os.path.join(prefix_output_dir, f'{prefix1}_{prefix2}_consensus_msa.fa')
+    print(f'Combining {msa1} and {msa2} into {output_msa}')
+    combine_msa(msa1, msa2, output_msa)
+    # also copy one of the contig order files to the output directory
+    output_contig_order = os.path.join(prefix_output_dir, f'{prefix1}_{prefix2}_ref_contig_order.tsv')
+    print(f'Copying {contig_order1} to {output_contig_order}')
+    shutil.copyfile(contig_order1, output_contig_order)
 
 if __name__ == "__main__":
     main()

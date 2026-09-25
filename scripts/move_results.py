@@ -47,7 +47,7 @@ def move_variant_calling(source_dir,batch_name,target_dir):
             filtered_sample_dst_dir = os.path.join(filtered_dir_dst,fname)
             os.makedirs(filtered_sample_dst_dir,exist_ok=True)
             for sub_fname in os.listdir(masked_sample_src_dir):
-                if sub_fname.endswith(('_final_mask.bed.gz')):
+                if sub_fname.endswith(('_final_mask.bed.gz','_GenomeCoverage.bedgraph')):
                     subprocess.run(['cp',os.path.join(masked_sample_src_dir,sub_fname),filtered_sample_dst_dir])
 
 

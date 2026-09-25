@@ -8,6 +8,7 @@ rule bedtools_genomecov:
     input:
         index_sorted_dups_rmvd_bam ="results/{prefix}/post_align/{sample}/sorted_bam_dups_removed/{sample}_final.bam"
     output:
+        genomecov_bed = "results/{prefix}/bedtools/{sample}/{sample}_GenomeCoverage.bedgraph",
         lowcoverage_bed_temp = temp("results/{prefix}/bedtools/{sample}/{sample}_lowcoverage_temp.bed"),
         lowcoverage_bed_sorted = temp("results/{prefix}/bedtools/{sample}/{sample}_lowcoverage_temp_sorted.bed"),
     params:
@@ -19,7 +20,8 @@ rule bedtools_genomecov:
         "benchmarks/{prefix}/bedtools_coverage/{sample}.benchmark.tsv"
     shell:
         """
-        bedtools genomecov -ibam {input.index_sorted_dups_rmvd_bam} -bga | awk -v threshold={params.coverage_threshold} -v label={params.filter_label} 'BEGIN {{OFS="\t"}} $4 < threshold {{print $1, $2, $3, label}}' > {output.lowcoverage_bed_temp}
+        bedtools genomecov -ibam {input.index_sorted_dups_rmvd_bam} -bga > {output.genomecov_bed}
+        awk -v threshold={params.coverage_threshold} -v label={params.filter_label} 'BEGIN {{OFS="\t"}} $4 < threshold {{print $1, $2, $3, label}}' {output.genomecov_bed} > {output.lowcoverage_bed_temp}
         bedtools sort -i {output.lowcoverage_bed_temp} > {output.lowcoverage_bed_sorted}
         """
 
